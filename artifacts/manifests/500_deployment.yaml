@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  namespace: run-once-duration-override
+  name: runoncedurationoverride
+  labels:
+    runoncedurationoverride: "true"
+spec:
+  selector:
+    matchLabels:
+      runoncedurationoverride: "true"
+  template:
+    metadata:
+      name: runoncedurationoverride
+      labels:
+        runoncedurationoverride: "true"
+    spec:
+      nodeSelector:
+        node-role.kubernetes.io/master: ''
+      hostNetwork: true
+      serviceAccountName: runoncedurationoverride
+      containers:
+        - name: runoncedurationoverride
+          image: quay.io/jchaloup/run-once-duration-override:dev
+          imagePullPolicy: Always
+          command:
+            - /usr/bin/run-once-duration-override-admission
+          args:
+            - "--secure-port=9400"
+            - "--bind-address=127.0.0.1"
+            - "--audit-log-path=-"
+            - "--tls-cert-file=/var/serving-cert/tls.crt"
+            - "--tls-private-key-file=/var/serving-cert/tls.key"
+            - "--v=8"
+          env:
+            - name: CONFIGURATION_PATH
+              value: /etc/runoncedurationoverride/config/override.yaml
+          ports:
+            - containerPort: 9400
+              hostPort: 9400
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/serving-cert
+              name: serving-cert
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 9400
+              scheme: HTTPS
+      volumes:
+        - name: serving-cert
+          secret:
+            defaultMode: 420
+            secretName: server-serving-cert
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
+        - key: node.kubernetes.io/unreachable
+          operator: Exists
+          effect: NoExecute
+          tolerationSeconds: 120
+        - key: node.kubernetes.io/not-ready
+          operator: Exists
+          effect: NoExecute
+          tolerationSeconds: 120
