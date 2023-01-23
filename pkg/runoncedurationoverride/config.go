@@ -17,7 +17,7 @@ type RunOnceDurationOverride struct {
 }
 
 type RunOnceDurationOverrideSpec struct {
-	ActiveDeadlineSeconds int64 `json:"ActiveDeadlineSeconds"`
+	ActiveDeadlineSeconds int64 `json:"activeDeadlineSeconds"`
 }
 
 type Config struct {

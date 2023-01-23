@@ -108,7 +108,7 @@ func (p *runOnceDurationOverrideAdmission) IsExempt(request *admissionv1.Admissi
 		return false, admissionresponse.WithBadRequest(request, err)
 	}
 
-	if !isPodExempt(pod) {
+	if isPodExempt(pod) {
 		return false, nil
 	}
 

@@ -7,7 +7,7 @@ import (
 // Run-once pods are pods that have a RestartPolicy of Never or OnFailure
 func isPodExempt(pod *corev1.Pod) bool {
 	if pod.Spec.RestartPolicy == corev1.RestartPolicyOnFailure || pod.Spec.RestartPolicy == corev1.RestartPolicyNever {
-		return true
+		return false
 	}
-	return false
+	return true
 }
