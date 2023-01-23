@@ -56,15 +56,6 @@ rules:
       - list
       - watch
   - apiGroups:
-      - ""
-    resources:
-      - namespaces
-      - limitranges
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
       - flowcontrol.apiserver.k8s.io
     resources:
       - prioritylevelconfigurations

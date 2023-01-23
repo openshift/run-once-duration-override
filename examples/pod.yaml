@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: example
+  namespace: test
+spec:
+  containers:
+    - name: busybox
+      restartPolicy: Never
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: ["ALL"]
+        runAsNonRoot:
+          true
+        seccompProfile:
+          type: "RuntimeDefault"
+      image: busybox:1.25
+      command:
+        - /bin/sh
+        - -ec
+        - |
+          while sleep 5; do date; done

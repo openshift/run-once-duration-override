@@ -37,3 +37,8 @@ manifests:
 
 	# load the certs into the manifest yaml.
 	./hack/load-cert-into-manifest.sh "$(CERT_FILE_PATH)" "$(MANIFEST_SECRET_YAML)" "$(MANIFEST_MUTATING_WEBHOOK_YAML)"
+
+clean:
+	$(RM) -r ./apiserver.local.config
+	$(RM) -r ./_output
+.PHONY: clean

@@ -24,7 +24,7 @@ spec:
           image: quay.io/jchaloup/run-once-duration-override:dev
           imagePullPolicy: Always
           command:
-            - /usr/bin/run-once-duration-override-admission
+            - /usr/bin/run-once-duration-override
           args:
             - "--secure-port=9400"
             - "--bind-address=127.0.0.1"
