@@ -16,6 +16,8 @@ include $(addprefix ./vendor/github.com/openshift/build-machinery-go/make/, \
 	targets/openshift/images.mk \
 )
 
+# Exclude e2e tests from unit testing
+GO_TEST_PACKAGES :=./pkg/... ./cmd/...
 IMAGE_REGISTRY :=registry.svc.ci.openshift.org
 
 # This will call a macro called "build-image" which will generate image specific targets based on the parameters:
@@ -25,6 +27,11 @@ IMAGE_REGISTRY :=registry.svc.ci.openshift.org
 # $3 - Dockerfile path
 # $4 - context directory for image build
 $(call build-image,run-once-duration-override,$(CI_IMAGE_REGISTRY)/ocp/4.12:run-once-duration-override,./images/ci/Dockerfile,.)
+
+test-e2e: GO_TEST_PACKAGES :=./test/e2e
+test-e2e: GO_TEST_FLAGS :=-v
+test-e2e: test-unit
+.PHONY: test-e2e
 
 # generate manifests for installing on a dev cluster.
 manifests:

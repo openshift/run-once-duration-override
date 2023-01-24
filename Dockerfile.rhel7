@@ -1,0 +1,20 @@
+FROM registry.ci.openshift.org/ocp/builder:rhel-8-golang-1.19-openshift-4.13 AS builder
+WORKDIR /go/src/github.com/openshift/run-once-duration-override
+COPY . .
+RUN make build
+
+FROM registry.ci.openshift.org/ocp/builder:rhel-8-base-openshift-4.13
+
+COPY --from=builder /go/src/github.com/openshift/run-once-duration-override/run-once-duration-override /usr/bin/
+
+# This needs to be made configurable and removed
+COPY --from=builder /go/src/github.com/openshift/run-once-duration-override/artifacts/configuration.yaml /etc/runoncedurationoverride/config/override.yaml
+
+# This needs to be made configurable and removed
+ENV CONFIGURATION_PATH=/etc/runoncedurationoverride/config/override.yaml
+
+LABEL io.k8s.display-name="Run Once Duration Operator" \
+      io.k8s.description="Mutating admission webhook for run-once pods" \
+      io.openshift.tags="openshift,run-once-duration-override" \
+      com.redhat.delivery.appregistry=true \
+      maintainer="AOS workloads team, <aos-workloads@redhat.com>"
