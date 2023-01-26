@@ -21,7 +21,7 @@ for a pod with `RestartPolicy` set to `Never` or `OnFailure`. The so called run-
    make manifests
    ```
 
-1. Update the image spec under `.spec.template.spec.containers[0].image` field in the `_output/manifests/500_deployment.yaml` Deployment to point to the newly built image
+1. Update the image spec under `.spec.template.spec.containers[0].image` field in the `_output/manifests/500_deployment.yaml` Deployment to point to the newly built image.
 
 1. Deploy the admission webhook:
    ```sh
