@@ -13,6 +13,7 @@ import (
 	k8sclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog/v2"
+	utilpointer "k8s.io/utils/pointer"
 
 	"github.com/openshift/library-go/pkg/operator/events"
 	"github.com/openshift/library-go/pkg/operator/resource/resourceapply"
@@ -106,6 +107,20 @@ func TestMain(m *testing.M) {
 			path: "assets/305_scc_hostnetwork_rolebinding.yaml",
 			readerAndApply: func(objBytes []byte) error {
 				_, _, err := resourceapply.ApplyRoleBinding(ctx, kubeClient.RbacV1(), eventRecorder, resourceread.ReadRoleBindingV1OrDie(objBytes))
+				return err
+			},
+		},
+		{
+			path: "assets/306_anonymous_cr.yaml",
+			readerAndApply: func(objBytes []byte) error {
+				_, _, err := resourceapply.ApplyClusterRole(ctx, kubeClient.RbacV1(), eventRecorder, resourceread.ReadClusterRoleV1OrDie(objBytes))
+				return err
+			},
+		},
+		{
+			path: "assets/307_anonymous_crb.yaml",
+			readerAndApply: func(objBytes []byte) error {
+				_, _, err := resourceapply.ApplyClusterRoleBinding(ctx, kubeClient.RbacV1(), eventRecorder, resourceread.ReadClusterRoleBindingV1OrDie(objBytes))
 				return err
 			},
 		},
@@ -217,7 +232,85 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func TestMutation(t *testing.T) {}
+func TestMutation(t *testing.T) {
+	// runoncedurationoverrides.admission.apps.openshift.io/enabled: "true"
+	ctx, cancelFnc := context.WithCancel(context.TODO())
+	defer cancelFnc()
+
+	clientSet := getKubeClientOrDie()
+
+	testNamespace := &corev1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "e2e-" + strings.ToLower(t.Name()),
+			Labels: map[string]string{
+				"runoncedurationoverrides.admission.apps.openshift.io/enabled": "true",
+			},
+		},
+	}
+	if _, err := clientSet.CoreV1().Namespaces().Create(ctx, testNamespace, metav1.CreateOptions{}); err != nil {
+		t.Fatalf("Unable to create ns %v", testNamespace.Name)
+	}
+	defer clientSet.CoreV1().Namespaces().Delete(ctx, testNamespace.Name, metav1.DeleteOptions{})
+
+	pod := &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: testNamespace.Name,
+			Name:      "test-mutating-admission-pod",
+		},
+		Spec: corev1.PodSpec{
+			SecurityContext: &corev1.PodSecurityContext{
+				RunAsNonRoot: utilpointer.BoolPtr(true),
+				SeccompProfile: &corev1.SeccompProfile{
+					Type: corev1.SeccompProfileTypeRuntimeDefault,
+				},
+			},
+			Containers: []corev1.Container{{
+				SecurityContext: &corev1.SecurityContext{
+					AllowPrivilegeEscalation: utilpointer.BoolPtr(false),
+					Capabilities: &corev1.Capabilities{
+						Drop: []corev1.Capability{
+							"ALL",
+						},
+					},
+				},
+				Name:            "pause",
+				ImagePullPolicy: "Always",
+				Image:           "kubernetes/pause",
+				Ports:           []corev1.ContainerPort{{ContainerPort: 80}},
+			}},
+		},
+	}
+
+	if _, err := clientSet.CoreV1().Pods(pod.Namespace).Create(ctx, pod, metav1.CreateOptions{}); err != nil {
+		t.Fatalf("Unable to create a pod: %v", err)
+	}
+
+	if err := wait.PollImmediate(1*time.Second, time.Minute, func() (bool, error) {
+		klog.Infof("Listing pods...")
+		pod, err := clientSet.CoreV1().Pods(pod.Namespace).Get(ctx, pod.Name, metav1.GetOptions{})
+		if err != nil {
+			klog.Errorf("Unable to get pod: %v", err)
+			return false, nil
+		}
+		if pod.Spec.NodeName == "" {
+			klog.Infof("Pod not yet assigned to a node")
+			return false, nil
+		}
+		klog.Infof("Pod successfully assigned to a node: %v", pod.Spec.NodeName)
+
+		if pod.Spec.ActiveDeadlineSeconds == nil || *pod.Spec.ActiveDeadlineSeconds != 3600 {
+			klog.Infof("pod.Spec.ActiveDeadlineSeconds is not set to 3600")
+			return false, nil
+		}
+
+		klog.Infof("pod.Spec.ActiveDeadlineSeconds = %v", *pod.Spec.ActiveDeadlineSeconds)
+
+		return true, nil
+	}); err != nil {
+		t.Fatalf("Unable to wait for a scheduled pod: %v", err)
+	}
+
+}
 
 func getKubeClientOrDie() *k8sclient.Clientset {
 	kubeconfig := os.Getenv("KUBECONFIG")
