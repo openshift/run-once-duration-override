@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"sync"
 
 	"github.com/openshift/run-once-duration-override/pkg/api"
@@ -67,8 +66,6 @@ func (m *runOnceDurationOverrideHook) Admit(request *admissionv1.AdmissionReques
 	m.lock.RLock()
 	defer m.lock.RUnlock()
 
-	fmt.Printf("\nAdmitting a pod!!!\n")
-
 	if !m.initialized {
 		return admissionresponse.WithInternalServerError(request, errors.New("not initialized"))
 	}
@@ -76,8 +73,6 @@ func (m *runOnceDurationOverrideHook) Admit(request *admissionv1.AdmissionReques
 	if !m.admission.IsApplicable(request) {
 		return admissionresponse.WithAllowed(request)
 	}
-
-	fmt.Printf("\nProcessing pod admission operator!!!\n")
 
 	exempt, response := m.admission.IsExempt(request)
 	if response != nil {
