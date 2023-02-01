@@ -7,7 +7,7 @@ import (
 	"github.com/openshift/run-once-duration-override/pkg/api"
 	admissionresponse "github.com/openshift/run-once-duration-override/pkg/response"
 	"github.com/openshift/run-once-duration-override/pkg/runoncedurationoverride"
-	"k8s.io/klog"
+	"k8s.io/klog/v2"
 
 	admissionv1 "k8s.io/api/admission/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
