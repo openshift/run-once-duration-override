@@ -108,11 +108,7 @@ func (p *runOnceDurationOverrideAdmission) IsExempt(request *admissionv1.Admissi
 		return false, admissionresponse.WithBadRequest(request, err)
 	}
 
-	if isPodExempt(pod) {
-		return false, nil
-	}
-
-	return true, nil
+	return isPodExempt(pod), nil
 }
 
 func getPod(request *admissionv1.AdmissionRequest) (pod *corev1.Pod, err error) {
@@ -139,7 +135,9 @@ func (p *runOnceDurationOverrideAdmission) Admit(request *admissionv1.AdmissionR
 		return admissionresponse.WithInternalServerError(request, err)
 	}
 
-	klog.V(5).Infof("namespace=%s pod activeDeadlineSeconds after mutating is: %v", request.Namespace, current.Spec.ActiveDeadlineSeconds)
+	if current.Spec.ActiveDeadlineSeconds != nil {
+		klog.V(5).Infof("namespace=%s pod activeDeadlineSeconds after mutating is: %v", request.Namespace, *current.Spec.ActiveDeadlineSeconds)
+	}
 
 	patch, patchErr := Patch(request.Object, current)
 	if patchErr != nil {

@@ -278,6 +278,7 @@ func TestMutation(t *testing.T) {
 				Image:           "kubernetes/pause",
 				Ports:           []corev1.ContainerPort{{ContainerPort: 80}},
 			}},
+			RestartPolicy: corev1.RestartPolicyNever,
 		},
 	}
 
