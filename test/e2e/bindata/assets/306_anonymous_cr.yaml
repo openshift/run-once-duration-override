@@ -4,7 +4,7 @@ metadata:
   name: runoncedurationoverride-anonymous-access
 rules:
   - apiGroups:
-      - "admission.apps.openshift.io"
+      - "admission.runoncedurationoverride.openshift.io"
     resources:
       - "runoncedurationoverrides"
     verbs:

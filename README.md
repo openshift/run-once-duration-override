@@ -40,9 +40,9 @@ for a pod with `RestartPolicy` set to `Never` or `OnFailure`. The so called run-
    $ oc create ns test
    ```
 
-1. Label the namespace with `runoncedurationoverrides.admission.apps.openshift.io/enabled: "true"`
+1. Label the namespace with `runoncedurationoverrides.admission.runoncedurationoverride.openshift.io/enabled: "true"`
    ```
-   $ oc label ns test runoncedurationoverrides.admission.apps.openshift.io/enabled=true
+   $ oc label ns test runoncedurationoverrides.admission.runoncedurationoverride.openshift.io/enabled=true
    ```
 
 1. Create a testing pod in the namespace with RestartPolicy set to Never. E.g.

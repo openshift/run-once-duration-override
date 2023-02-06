@@ -1,6 +1,6 @@
 package api
 
 const (
-	Group   = "admission.apps.openshift.io"
+	Group   = "admission.runoncedurationoverride.openshift.io"
 	Version = "v1"
 )
