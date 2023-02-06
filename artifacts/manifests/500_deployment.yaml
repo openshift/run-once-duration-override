@@ -26,7 +26,7 @@ spec:
           command:
             - /usr/bin/run-once-duration-override
           args:
-            - "--secure-port=9400"
+            - "--secure-port=9448"
             - "--bind-address=127.0.0.1"
             - "--audit-log-path=-"
             - "--tls-cert-file=/var/serving-cert/tls.crt"
@@ -36,8 +36,8 @@ spec:
             - name: CONFIGURATION_PATH
               value: /etc/runoncedurationoverride/config/override.yaml
           ports:
-            - containerPort: 9400
-              hostPort: 9400
+            - containerPort: 9448
+              hostPort: 9448
               protocol: TCP
           volumeMounts:
             - mountPath: /var/serving-cert
@@ -45,7 +45,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /healthz
-              port: 9400
+              port: 9448
               scheme: HTTPS
       volumes:
         - name: serving-cert

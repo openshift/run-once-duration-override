@@ -15,7 +15,7 @@ webhooks:
           values: ["0","1"]
     matchPolicy: Equivalent
     clientConfig:
-      url: https://localhost:9400/apis/admission.runoncedurationoverride.openshift.io/v1/runoncedurationoverrides
+      url: https://localhost:9448/apis/admission.runoncedurationoverride.openshift.io/v1/runoncedurationoverrides
       caBundle: SERVICE_SERVING_CERT_CA
     rules:
       - operations:
