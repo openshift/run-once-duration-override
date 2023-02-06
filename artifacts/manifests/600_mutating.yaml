@@ -1,21 +1,21 @@
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
-  name: runoncedurationoverrides.admission.apps.openshift.io
+  name: runoncedurationoverrides.admission.runoncedurationoverride.openshift.io
   labels:
     runoncedurationoverride: "true"
 webhooks:
-  - name: runoncedurationoverrides.admission.apps.openshift.io
+  - name: runoncedurationoverrides.admission.runoncedurationoverride.openshift.io
     namespaceSelector:
       matchLabels:
-        runoncedurationoverrides.admission.apps.openshift.io/enabled: "true"
+        runoncedurationoverrides.admission.runoncedurationoverride.openshift.io/enabled: "true"
       matchExpressions:
         - key: runlevel
           operator: NotIn
           values: ["0","1"]
     matchPolicy: Equivalent
     clientConfig:
-      url: https://localhost:9400/apis/admission.apps.openshift.io/v1/runoncedurationoverrides
+      url: https://localhost:9400/apis/admission.runoncedurationoverride.openshift.io/v1/runoncedurationoverrides
       caBundle: SERVICE_SERVING_CERT_CA
     rules:
       - operations:

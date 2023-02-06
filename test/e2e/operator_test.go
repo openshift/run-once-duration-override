@@ -233,7 +233,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestMutation(t *testing.T) {
-	// runoncedurationoverrides.admission.apps.openshift.io/enabled: "true"
+	// runoncedurationoverrides.admission.runoncedurationoverride.openshift.io/enabled: "true"
 	ctx, cancelFnc := context.WithCancel(context.TODO())
 	defer cancelFnc()
 
@@ -243,7 +243,7 @@ func TestMutation(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "e2e-" + strings.ToLower(t.Name()),
 			Labels: map[string]string{
-				"runoncedurationoverrides.admission.apps.openshift.io/enabled": "true",
+				"runoncedurationoverrides.admission.runoncedurationoverride.openshift.io/enabled": "true",
 			},
 		},
 	}
@@ -314,7 +314,7 @@ func TestMutation(t *testing.T) {
 }
 
 func TestNotMutation(t *testing.T) {
-	// runoncedurationoverrides.admission.apps.openshift.io/enabled: "true"
+	// runoncedurationoverrides.admission.runoncedurationoverride.openshift.io/enabled: "true"
 	ctx, cancelFnc := context.WithCancel(context.TODO())
 	defer cancelFnc()
 
@@ -324,7 +324,7 @@ func TestNotMutation(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "e2e-" + strings.ToLower(t.Name()),
 			Labels: map[string]string{
-				"runoncedurationoverrides.admission.apps.openshift.io/enabled": "true",
+				"runoncedurationoverrides.admission.runoncedurationoverride.openshift.io/enabled": "true",
 			},
 		},
 	}
