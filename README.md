@@ -54,9 +54,9 @@ for a pod with `RestartPolicy` set to `Never` or `OnFailure`. The so called run-
      name: example
      namespace: test
    spec:
+     restartPolicy: Never
      containers:
        - name: busybox
-         restartPolicy: Never
          securityContext:
            allowPrivilegeEscalation: false
            capabilities:
