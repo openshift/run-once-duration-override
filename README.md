@@ -80,6 +80,6 @@ for a pod with `RestartPolicy` set to `Never` or `OnFailure`. The so called run-
 
 1. Checking the `.spec.activeDeadlineSeconds` field was set to 3600:
    ```sh
-   $ oc get pods -n test -o json | jq '.items[0].spec.activeDeadlineSeconds'
+   $ oc get pods -n test -o json | jq '.spec.activeDeadlineSeconds'
    3600
    ```
