@@ -2,6 +2,7 @@ package e2e
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -233,163 +234,172 @@ func TestMain(m *testing.M) {
 }
 
 func TestMutation(t *testing.T) {
-	// runoncedurationoverrides.admission.runoncedurationoverride.openshift.io/enabled: "true"
-	ctx, cancelFnc := context.WithCancel(context.TODO())
-	defer cancelFnc()
-
-	clientSet := getKubeClientOrDie()
-
-	testNamespace := &corev1.Namespace{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: "e2e-" + strings.ToLower(t.Name()),
-			Labels: map[string]string{
-				"runoncedurationoverrides.admission.runoncedurationoverride.openshift.io/enabled": "true",
-			},
-		},
-	}
-	if _, err := clientSet.CoreV1().Namespaces().Create(ctx, testNamespace, metav1.CreateOptions{}); err != nil {
-		t.Fatalf("Unable to create ns %v", testNamespace.Name)
-	}
-	defer clientSet.CoreV1().Namespaces().Delete(ctx, testNamespace.Name, metav1.DeleteOptions{})
-
-	pod := &corev1.Pod{
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: testNamespace.Name,
-			Name:      "test-mutating-admission-pod",
-		},
-		Spec: corev1.PodSpec{
-			SecurityContext: &corev1.PodSecurityContext{
-				RunAsNonRoot: utilpointer.BoolPtr(true),
-				SeccompProfile: &corev1.SeccompProfile{
-					Type: corev1.SeccompProfileTypeRuntimeDefault,
+	tests := []struct {
+		name                  string
+		pod                   *corev1.Pod
+		expectedToSet         bool
+		activeDeadlineSeconds int64
+	}{
+		{
+			name: "set activedeadlineseconds to 3600",
+			pod: &corev1.Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "test-mutating-admission-pod",
 				},
-			},
-			Containers: []corev1.Container{{
-				SecurityContext: &corev1.SecurityContext{
-					AllowPrivilegeEscalation: utilpointer.BoolPtr(false),
-					Capabilities: &corev1.Capabilities{
-						Drop: []corev1.Capability{
-							"ALL",
+				Spec: corev1.PodSpec{
+					SecurityContext: &corev1.PodSecurityContext{
+						RunAsNonRoot: utilpointer.BoolPtr(true),
+						SeccompProfile: &corev1.SeccompProfile{
+							Type: corev1.SeccompProfileTypeRuntimeDefault,
 						},
 					},
-				},
-				Name:            "pause",
-				ImagePullPolicy: "Always",
-				Image:           "kubernetes/pause",
-				Ports:           []corev1.ContainerPort{{ContainerPort: 80}},
-			}},
-			RestartPolicy: corev1.RestartPolicyNever,
-		},
-	}
-
-	if _, err := clientSet.CoreV1().Pods(pod.Namespace).Create(ctx, pod, metav1.CreateOptions{}); err != nil {
-		t.Fatalf("Unable to create a pod: %v", err)
-	}
-
-	if err := wait.PollImmediate(1*time.Second, time.Minute, func() (bool, error) {
-		klog.Infof("Listing pods...")
-		pod, err := clientSet.CoreV1().Pods(pod.Namespace).Get(ctx, pod.Name, metav1.GetOptions{})
-		if err != nil {
-			klog.Errorf("Unable to get pod: %v", err)
-			return false, nil
-		}
-		if pod.Spec.NodeName == "" {
-			klog.Infof("Pod not yet assigned to a node")
-			return false, nil
-		}
-		klog.Infof("Pod successfully assigned to a node: %v", pod.Spec.NodeName)
-
-		if pod.Spec.ActiveDeadlineSeconds == nil || *pod.Spec.ActiveDeadlineSeconds != 3600 {
-			klog.Infof("pod.Spec.ActiveDeadlineSeconds is not set to 3600")
-			return false, nil
-		}
-
-		klog.Infof("pod.Spec.ActiveDeadlineSeconds = %v", *pod.Spec.ActiveDeadlineSeconds)
-
-		return true, nil
-	}); err != nil {
-		t.Fatalf("Unable to wait for a scheduled pod: %v", err)
-	}
-
-}
-
-func TestNotMutation(t *testing.T) {
-	// runoncedurationoverrides.admission.runoncedurationoverride.openshift.io/enabled: "true"
-	ctx, cancelFnc := context.WithCancel(context.TODO())
-	defer cancelFnc()
-
-	clientSet := getKubeClientOrDie()
-
-	testNamespace := &corev1.Namespace{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: "e2e-" + strings.ToLower(t.Name()),
-			Labels: map[string]string{
-				"runoncedurationoverrides.admission.runoncedurationoverride.openshift.io/enabled": "true",
-			},
-		},
-	}
-	if _, err := clientSet.CoreV1().Namespaces().Create(ctx, testNamespace, metav1.CreateOptions{}); err != nil {
-		t.Fatalf("Unable to create ns %v", testNamespace.Name)
-	}
-	defer clientSet.CoreV1().Namespaces().Delete(ctx, testNamespace.Name, metav1.DeleteOptions{})
-
-	pod := &corev1.Pod{
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: testNamespace.Name,
-			Name:      "test-mutating-admission-pod",
-		},
-		Spec: corev1.PodSpec{
-			SecurityContext: &corev1.PodSecurityContext{
-				RunAsNonRoot: utilpointer.BoolPtr(true),
-				SeccompProfile: &corev1.SeccompProfile{
-					Type: corev1.SeccompProfileTypeRuntimeDefault,
+					Containers: []corev1.Container{{
+						SecurityContext: &corev1.SecurityContext{
+							AllowPrivilegeEscalation: utilpointer.BoolPtr(false),
+							Capabilities: &corev1.Capabilities{
+								Drop: []corev1.Capability{
+									"ALL",
+								},
+							},
+						},
+						Name:            "pause",
+						ImagePullPolicy: "Always",
+						Image:           "kubernetes/pause",
+						Ports:           []corev1.ContainerPort{{ContainerPort: 80}},
+					}},
+					RestartPolicy: corev1.RestartPolicyNever,
 				},
 			},
-			Containers: []corev1.Container{{
-				SecurityContext: &corev1.SecurityContext{
-					AllowPrivilegeEscalation: utilpointer.BoolPtr(false),
-					Capabilities: &corev1.Capabilities{
-						Drop: []corev1.Capability{
-							"ALL",
+			expectedToSet:         true,
+			activeDeadlineSeconds: 3600,
+		},
+		{
+			name: "set min if pod spec also contains activeDeadlineSeconds",
+			pod: &corev1.Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "test-mutating-admission-pod",
+				},
+				Spec: corev1.PodSpec{
+					SecurityContext: &corev1.PodSecurityContext{
+						RunAsNonRoot: utilpointer.BoolPtr(true),
+						SeccompProfile: &corev1.SeccompProfile{
+							Type: corev1.SeccompProfileTypeRuntimeDefault,
 						},
 					},
+					Containers: []corev1.Container{{
+						SecurityContext: &corev1.SecurityContext{
+							AllowPrivilegeEscalation: utilpointer.BoolPtr(false),
+							Capabilities: &corev1.Capabilities{
+								Drop: []corev1.Capability{
+									"ALL",
+								},
+							},
+						},
+						Name:            "pause",
+						ImagePullPolicy: "Always",
+						Image:           "kubernetes/pause",
+						Ports:           []corev1.ContainerPort{{ContainerPort: 80}},
+					}},
+					ActiveDeadlineSeconds: utilpointer.Int64(500),
+					RestartPolicy:         corev1.RestartPolicyNever,
 				},
-				Name:            "pause",
-				ImagePullPolicy: "Always",
-				Image:           "kubernetes/pause",
-				Ports:           []corev1.ContainerPort{{ContainerPort: 80}},
-			}},
-			RestartPolicy: corev1.RestartPolicyAlways,
+			},
+			expectedToSet:         true,
+			activeDeadlineSeconds: 500,
+		},
+		{
+			name: "not set activeDeadlineSeconds because RestartPolicy is Always",
+			pod: &corev1.Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "test-mutating-admission-pod",
+				},
+				Spec: corev1.PodSpec{
+					SecurityContext: &corev1.PodSecurityContext{
+						RunAsNonRoot: utilpointer.BoolPtr(true),
+						SeccompProfile: &corev1.SeccompProfile{
+							Type: corev1.SeccompProfileTypeRuntimeDefault,
+						},
+					},
+					Containers: []corev1.Container{{
+						SecurityContext: &corev1.SecurityContext{
+							AllowPrivilegeEscalation: utilpointer.BoolPtr(false),
+							Capabilities: &corev1.Capabilities{
+								Drop: []corev1.Capability{
+									"ALL",
+								},
+							},
+						},
+						Name:            "pause",
+						ImagePullPolicy: "Always",
+						Image:           "kubernetes/pause",
+						Ports:           []corev1.ContainerPort{{ContainerPort: 80}},
+					}},
+					RestartPolicy: corev1.RestartPolicyAlways,
+				},
+			},
+			expectedToSet:         false,
+			activeDeadlineSeconds: 3600,
 		},
 	}
 
-	if _, err := clientSet.CoreV1().Pods(pod.Namespace).Create(ctx, pod, metav1.CreateOptions{}); err != nil {
-		t.Fatalf("Unable to create a pod: %v", err)
+	for itr, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			// runoncedurationoverrides.admission.runoncedurationoverride.openshift.io/enabled: "true"
+			ctx, cancelFnc := context.WithCancel(context.TODO())
+			defer cancelFnc()
+
+			clientSet := getKubeClientOrDie()
+
+			testNamespace := &corev1.Namespace{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: fmt.Sprintf("e2e-rodoo-namespace-%d", itr),
+					Labels: map[string]string{
+						"runoncedurationoverrides.admission.runoncedurationoverride.openshift.io/enabled": "true",
+					},
+				},
+			}
+			if _, err := clientSet.CoreV1().Namespaces().Create(ctx, testNamespace, metav1.CreateOptions{}); err != nil {
+				t.Fatalf("Unable to create ns %v err: %v", testNamespace.Name, err)
+			}
+			defer clientSet.CoreV1().Namespaces().Delete(ctx, testNamespace.Name, metav1.DeleteOptions{})
+			test.pod.Namespace = testNamespace.Name
+
+			if _, err := clientSet.CoreV1().Pods(test.pod.Namespace).Create(ctx, test.pod, metav1.CreateOptions{}); err != nil {
+				t.Fatalf("Unable to create a pod: %v", err)
+			}
+
+			if err := wait.PollImmediate(1*time.Second, time.Minute, func() (bool, error) {
+				klog.Infof("Listing pods...")
+				pod, err := clientSet.CoreV1().Pods(test.pod.Namespace).Get(ctx, test.pod.Name, metav1.GetOptions{})
+				if err != nil {
+					klog.Errorf("Unable to get pod: %v", err)
+					return false, nil
+				}
+				if pod.Spec.NodeName == "" {
+					klog.Infof("Pod not yet assigned to a node")
+					return false, nil
+				}
+				klog.Infof("Pod successfully assigned to a node: %v", pod.Spec.NodeName)
+
+				if test.expectedToSet {
+					if pod.Spec.ActiveDeadlineSeconds == nil || *pod.Spec.ActiveDeadlineSeconds != test.activeDeadlineSeconds {
+						klog.Infof("pod.Spec.ActiveDeadlineSeconds is set to %v, expected %v", *pod.Spec.ActiveDeadlineSeconds, test.activeDeadlineSeconds)
+						return false, nil
+					}
+					klog.Infof("pod.Spec.ActiveDeadlineSeconds = %v", *pod.Spec.ActiveDeadlineSeconds)
+				} else {
+					if pod.Spec.ActiveDeadlineSeconds != nil && *pod.Spec.ActiveDeadlineSeconds == test.activeDeadlineSeconds {
+						klog.Infof("pod.Spec.ActiveDeadlineSeconds is set to %v, even though restartPolicy is Always", test.activeDeadlineSeconds)
+						return false, nil
+					}
+				}
+
+				return true, nil
+			}); err != nil {
+				t.Fatalf("Unable to wait for a scheduled pod: %v", err)
+			}
+		})
 	}
-
-	if err := wait.PollImmediate(1*time.Second, time.Minute, func() (bool, error) {
-		klog.Infof("Listing pods...")
-		pod, err := clientSet.CoreV1().Pods(pod.Namespace).Get(ctx, pod.Name, metav1.GetOptions{})
-		if err != nil {
-			klog.Errorf("Unable to get pod: %v", err)
-			return false, nil
-		}
-		if pod.Spec.NodeName == "" {
-			klog.Infof("Pod not yet assigned to a node")
-			return false, nil
-		}
-		klog.Infof("Pod successfully assigned to a node: %v", pod.Spec.NodeName)
-
-		if pod.Spec.ActiveDeadlineSeconds != nil && *pod.Spec.ActiveDeadlineSeconds == 3600 {
-			klog.Infof("pod.Spec.ActiveDeadlineSeconds is set to 3600, even though restartPolicy is Always")
-			return false, nil
-		}
-
-		return true, nil
-	}); err != nil {
-		t.Fatalf("Unable to wait for a scheduled pod: %v", err)
-	}
-
 }
 
 func getKubeClientOrDie() *k8sclient.Clientset {
