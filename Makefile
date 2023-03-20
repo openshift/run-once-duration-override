@@ -33,6 +33,12 @@ test-e2e: GO_TEST_FLAGS :=-v
 test-e2e: test-unit
 .PHONY: test-e2e
 
+# LDFLAGS for build info metrics
+BRANCH?=$(shell git branch --show-current)
+SHA1?=$(shell git rev-parse HEAD)
+LDFLAG_LOCATION=github.com/openshift/run-once-duration-override/pkg/version
+LDFLAGS=-ldflags "-X ${LDFLAG_LOCATION}.version=${VERSION} -X ${LDFLAG_LOCATION}.buildDate=${BUILD} -X ${LDFLAG_LOCATION}.gitbranch=${BRANCH} -X ${LDFLAG_LOCATION}.gitsha1=${SHA1}"
+
 # generate manifests for installing on a dev cluster.
 manifests:
 	rm -rf $(MANIFEST_DIR)

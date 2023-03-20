@@ -11,14 +11,21 @@ import (
 
 	admissionv1 "k8s.io/api/admission/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	apiserver "k8s.io/apiserver/pkg/server"
+	"k8s.io/apiserver/pkg/server/mux"
+	apiserveroptions "k8s.io/apiserver/pkg/server/options"
 	restclient "k8s.io/client-go/rest"
+	"k8s.io/component-base/metrics/legacyregistry"
+)
+
+const (
+	DefaultRODOMetricsPort = 10258
 )
 
 type runOnceDurationOverrideHook struct {
 	lock        sync.RWMutex
 	initialized bool
-
-	admission runoncedurationoverride.Admission
+	admission   runoncedurationoverride.Admission
 }
 
 // Initialize is called as a post-start hook
@@ -45,6 +52,21 @@ func (m *runOnceDurationOverrideHook) Initialize(kubeClientConfig *restclient.Co
 	m.admission = admission
 
 	klog.V(1).Infof("name=%s admission webhook loaded successfully", runoncedurationoverride.Name)
+
+	var LoopbackClientConfig *restclient.Config
+	var SecureServing *apiserver.SecureServingInfo
+
+	secureServing := apiserveroptions.NewSecureServingOptions().WithLoopback()
+	secureServing.BindPort = DefaultRODOMetricsPort
+
+	if err := secureServing.ApplyTo(&SecureServing, &LoopbackClientConfig); err != nil {
+		klog.V(1).Infof("name=%s failed to initialize webhook mectrics - %s", runoncedurationoverride.Name, err.Error())
+		return err
+	}
+	pathRecorderMux := mux.NewPathRecorderMux("rodo")
+	pathRecorderMux.Handle("/metrics", legacyregistry.HandlerWithReset())
+
+	klog.V(1).Infof("name=%s admission webhook metrics up", runoncedurationoverride.Name)
 
 	return nil
 }
