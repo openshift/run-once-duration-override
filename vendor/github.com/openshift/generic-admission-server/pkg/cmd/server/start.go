@@ -79,6 +79,32 @@ func NewCommandStartAdmissionServer(out, errOut io.Writer, stopCh <-chan struct{
 	return cmd
 }
 
+func NewCommandStartAdmissionServerWithMetrics(out, errOut io.Writer, stopCh <-chan struct{}, admissionHooks ...apiserver.AdmissionHook) *cobra.Command {
+	o := NewAdmissionServerOptions(out, errOut, admissionHooks...)
+
+	cmd := &cobra.Command{
+		Short: "Launch a namespace reservation API server",
+		Long:  "Launch a namespace reservation API server",
+		RunE: func(c *cobra.Command, args []string) error {
+			if err := o.Complete(); err != nil {
+				return err
+			}
+			if err := o.Validate(args); err != nil {
+				return err
+			}
+			if err := o.RunAdmissionServer(stopCh); err != nil {
+				return err
+			}
+			return nil
+		},
+	}
+
+	flags := cmd.Flags()
+	o.RecommendedOptions.AddFlags(flags)
+
+	return cmd
+}
+
 func (o AdmissionServerOptions) Validate(args []string) error {
 	return nil
 }
