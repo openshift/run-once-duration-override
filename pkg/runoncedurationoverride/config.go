@@ -50,7 +50,7 @@ func Decode(reader io.Reader) (object *RunOnceDurationOverride, err error) {
 
 func DecodeWithFile(path string) (object *RunOnceDurationOverride, err error) {
 	reader, openErr := os.Open(path)
-	if err != nil {
+	if openErr != nil {
 		err = fmt.Errorf("unable to load file %s: %s", path, openErr)
 		return
 	}
