@@ -1,9 +1,11 @@
 module github.com/openshift/run-once-duration-override
 
-go 1.21
+go 1.22.0
+
+toolchain go1.22.9
 
 require (
-	github.com/openshift/build-machinery-go v0.0.0-20231128094528-1e9b1b0595c8
+	github.com/openshift/build-machinery-go v0.0.0-20250211133638-a00a772ae1a2
 	github.com/openshift/generic-admission-server v1.14.1-0.20231020105858-8dcc3c9b298f
 	github.com/openshift/library-go v0.0.0-20240116081341-964bcb3f545c
 	github.com/stretchr/testify v1.8.4
