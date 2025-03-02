@@ -6,7 +6,7 @@ require (
 	github.com/openshift/build-machinery-go v0.0.0-20231128094528-1e9b1b0595c8
 	github.com/openshift/generic-admission-server v1.14.1-0.20231020105858-8dcc3c9b298f
 	github.com/openshift/library-go v0.0.0-20240116081341-964bcb3f545c
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.10.0
 	golang.org/x/net v0.23.0 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.2.0
 	k8s.io/api v0.29.4
