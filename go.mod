@@ -8,7 +8,7 @@ require (
 	github.com/openshift/library-go v0.0.0-20240116081341-964bcb3f545c
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/net v0.23.0 // indirect
-	gomodules.xyz/jsonpatch/v2 v2.2.0
+	gomodules.xyz/jsonpatch/v2 v2.5.0
 	k8s.io/api v0.29.4
 	k8s.io/apimachinery v0.29.4
 	k8s.io/client-go v0.29.4
