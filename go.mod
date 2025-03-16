@@ -9,7 +9,7 @@ require (
 	github.com/openshift/generic-admission-server v1.14.1-0.20240926143655-a882ebf9df19
 	github.com/openshift/library-go v0.0.0-20241001171606-756adf2188fc
 	github.com/stretchr/testify v1.9.0
-	gomodules.xyz/jsonpatch/v2 v2.2.0
+	gomodules.xyz/jsonpatch/v2/v3 v3.0.1
 	k8s.io/api v0.31.1
 	k8s.io/apimachinery v0.31.1
 	k8s.io/client-go v0.31.1
