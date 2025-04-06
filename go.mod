@@ -1,8 +1,8 @@
 module github.com/openshift/run-once-duration-override
 
-go 1.22.0
+go 1.23
 
-toolchain go1.22.1
+toolchain go1.23.8
 
 require (
 	github.com/openshift/build-machinery-go v0.0.0-20240910153727-5725581bdf8f
@@ -107,7 +107,7 @@ require (
 	k8s.io/kube-aggregator v0.31.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20240228011516-70dd3763d340 // indirect
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.30.3 // indirect
-	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
+	sigs.k8s.io/json v0.0.0-20241014173422-cfa47c3a1cc8 // indirect
 	sigs.k8s.io/kube-storage-version-migrator v0.0.6-0.20230721195810-5c8923c5ff96 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
