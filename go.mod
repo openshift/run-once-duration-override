@@ -1,13 +1,15 @@
 module github.com/openshift/run-once-duration-override
 
-go 1.21
+go 1.23.0
+
+toolchain go1.23.8
 
 require (
 	github.com/openshift/build-machinery-go v0.0.0-20231128094528-1e9b1b0595c8
 	github.com/openshift/generic-admission-server v1.14.1-0.20231020105858-8dcc3c9b298f
 	github.com/openshift/library-go v0.0.0-20240116081341-964bcb3f545c
 	github.com/stretchr/testify v1.8.4
-	golang.org/x/net v0.23.0 // indirect
+	golang.org/x/net v0.39.0 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.2.0
 	k8s.io/api v0.29.4
 	k8s.io/apimachinery v0.29.4
@@ -81,13 +83,13 @@ require (
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.19.0 // indirect
-	golang.org/x/crypto v0.21.0 // indirect
+	golang.org/x/crypto v0.37.0 // indirect
 	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e // indirect
 	golang.org/x/oauth2 v0.10.0 // indirect
-	golang.org/x/sync v0.5.0 // indirect
-	golang.org/x/sys v0.18.0 // indirect
-	golang.org/x/term v0.18.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/sync v0.13.0 // indirect
+	golang.org/x/sys v0.32.0 // indirect
+	golang.org/x/term v0.31.0 // indirect
+	golang.org/x/text v0.24.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20230803162519-f966b187b2e5 // indirect
