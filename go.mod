@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/openshift/build-machinery-go v0.0.0-20230306181456-d321ffa04533
-	github.com/openshift/generic-admission-server v1.14.1-0.20230511131000-6e8e035e4fe8
+	github.com/openshift/generic-admission-server 21579bd45f95
 	github.com/openshift/library-go v0.0.0-20230508110756-9b7abe2c9cbf
 	github.com/stretchr/testify v1.8.1
 	gomodules.xyz/jsonpatch/v2 v2.2.0
