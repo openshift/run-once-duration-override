@@ -7,7 +7,7 @@ toolchain go1.22.1
 require (
 	github.com/openshift/build-machinery-go v0.0.0-20240910153727-5725581bdf8f
 	github.com/openshift/generic-admission-server v1.14.1-0.20240926143655-a882ebf9df19
-	github.com/openshift/library-go v0.0.0-20241001171606-756adf2188fc
+	github.com/openshift/library-go 7de7fae45594
 	github.com/stretchr/testify v1.9.0
 	gomodules.xyz/jsonpatch/v2 v2.2.0
 	k8s.io/api v0.31.1
