@@ -3,9 +3,9 @@ module github.com/openshift/run-once-duration-override
 go 1.23.0
 
 require (
-	github.com/openshift/build-machinery-go v0.0.0-20250211133638-a00a772ae1a2
+	github.com/openshift/build-machinery-go v0.0.0-20250414185254-3ce8e800ceda
 	github.com/openshift/generic-admission-server v1.14.1-0.20250203204636-21579bd45f95
-	github.com/openshift/library-go v0.0.0-20250217144305-c917e6d528b2
+	github.com/openshift/library-go v0.0.0-20250512121900-863508cf7a27
 	github.com/stretchr/testify v1.9.0
 	gomodules.xyz/jsonpatch/v2 v2.2.0
 	k8s.io/api v0.32.2
@@ -53,7 +53,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/openshift/api v0.0.0-20250124212313-a770960d61e0 // indirect
+	github.com/openshift/api v0.0.0-20250320170726-75d64d71980b // indirect
 	github.com/openshift/client-go v0.0.0-20250125113824-8e1f0b8fa9a7 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
