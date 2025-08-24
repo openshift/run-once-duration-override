@@ -1,4 +1,4 @@
-# Run Once Duration Override 
+# Run Once Duration Override
 
 The Run Once Duration Override mutating admission webhook allows to override `activeDeadlineSeconds` field
 for a pod with `RestartPolicy` set to `Never` or `OnFailure`. The so called run-once pods.
