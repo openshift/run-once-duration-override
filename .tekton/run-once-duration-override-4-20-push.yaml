@@ -10,7 +10,7 @@ metadata:
     pipelinesascode.tekton.dev/on-cel-expression: event == "push"
       && target_branch == "release-4.20"
       && (
-      ".tekton/run-once-duration-override-4-20-pull-request.yaml".pathChanged()
+      ".tekton/run-once-duration-override-4-20-push-request.yaml".pathChanged()
       || "cmd/***".pathChanged()
       || "pkg/***".pathChanged()
       || "vendor/***".pathChanged()
