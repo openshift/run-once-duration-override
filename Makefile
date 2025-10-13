@@ -10,7 +10,7 @@ CERT_FILE_PATH := "$(OUTPUT_DIR)/certs.yaml"
 MANIFEST_SECRET_YAML := "$(MANIFEST_DIR)/400_secret.yaml"
 MANIFEST_MUTATING_WEBHOOK_YAML := "$(MANIFEST_DIR)/600_mutating.yaml"
 
-# Include the library makefile
+# Include the library makefile 
 include $(addprefix ./vendor/github.com/openshift/build-machinery-go/make/, \
 	golang.mk \
 	targets/openshift/images.mk \
