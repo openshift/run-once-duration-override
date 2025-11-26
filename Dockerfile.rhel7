@@ -19,6 +19,6 @@ LABEL io.k8s.display-name="Run Once Duration Operator" \
       com.redhat.delivery.appregistry=true \
       release="1.0.3" \
       version="1.0.3" \
-      url="https://github.com/openshift/run-once-duration-override-operator" \
+      url="https://github.com/openshift/run-once-duration-override" \
       vendor="Red Hat, Inc." \
       maintainer="AOS workloads team, <aos-workloads@redhat.com>"
