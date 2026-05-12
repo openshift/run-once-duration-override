@@ -3,7 +3,7 @@ WORKDIR /go/src/github.com/openshift/run-once-duration-override
 COPY . .
 RUN make build --warn-undefined-variables
 
-FROM registry.access.redhat.com/ubi9/ubi-minimal:latest@sha256:8d0a8fb39ec907e8ca62cdd24b62a63ca49a30fe465798a360741fde58437a23
+FROM registry.access.redhat.com/ubi9/ubi-minimal:latest@sha256:12db9874bd753eb98b1ab3d840e75de5d6842ac0604fbd68c012adefe97140be
 COPY --from=builder /go/src/github.com/openshift/run-once-duration-override/run-once-duration-override /usr/bin/
 RUN mkdir /licenses
 COPY --from=builder /go/src/github.com/openshift/run-once-duration-override/LICENSE /licenses/.
