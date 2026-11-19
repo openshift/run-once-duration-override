@@ -20,7 +20,7 @@ include $(addprefix ./vendor/github.com/openshift/build-machinery-go/make/, \
 GO_TEST_PACKAGES :=./pkg/... ./cmd/...
 GO_BUILD_FLAGS :=-tags strictfipsruntime
 
-IMAGE_REGISTRY :=registry.svc.ci.openshift.org
+CI_IMAGE_REGISTRY ?= registry.ci.openshift.org
 
 # This will call a macro called "build-image" which will generate image specific targets based on the parameters:
 # $0 - macro name
@@ -29,6 +29,9 @@ IMAGE_REGISTRY :=registry.svc.ci.openshift.org
 # $3 - Dockerfile path
 # $4 - context directory for image build
 $(call build-image,run-once-duration-override,$(CI_IMAGE_REGISTRY)/ocp/4.12:run-once-duration-override,./images/ci/Dockerfile,.)
+
+# Verify that the golang version is consistent across go.mod, .ci-operator.yaml and Dockerfile.rhel7.
+$(call verify-golang-versions,Dockerfile.rhel7)
 
 test-e2e: GO_TEST_PACKAGES :=./test/e2e
 test-e2e: GO_TEST_FLAGS :=-v
